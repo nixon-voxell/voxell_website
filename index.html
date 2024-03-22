@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+
+<style>
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
+
+<body style="margin: 0px;">
+  <script type="module">
+    import init from './voxell_website.js'
+
+    init().catch((error) => {
+      if (!error.message.startsWith("Using exceptions for control flow, don't mind me. This isn't actually an error!")) {
+        throw error;
+      }
+    });
+  </script>
+</body>
+
+</html>
