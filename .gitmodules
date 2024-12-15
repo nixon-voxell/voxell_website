@@ -1,0 +1,3 @@
+[submodule "external_crates/velyst"]
+	path = external_crates/velyst
+	url = https://github.com/voxell-tech/velyst

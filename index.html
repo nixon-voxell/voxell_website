@@ -3,22 +3,42 @@
 
 <style>
 canvas {
-  width: 100% !important;
-  height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    outline: none;
 }
-html, body { width:100%; height:100%; }
+html, body {
+    width:100%;
+    height:100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
 </style>
 
-<body style="margin: 0px;">
-  <script type="module">
-    import init from './voxell_website.js'
+<head>
+    <meta charset="utf-8" />
+    <title>Voxell</title>
+    <!-- <link data-trunk rel="copy-dir" href="../assets" /> -->
+    <!-- <link data-trunk rel="inline" href="out/style.css" /> -->
+    <!-- <link data-trunk rel="inline" type="module" href="out/restart-audio-context.js" /> -->
+    <!-- <link data-trunk rel="rust" data-cargo-no-default-features data-wasm-opt="s" href="../" /> -->
+</head>
 
-    init().catch((error) => {
-      if (!error.message.startsWith("Using exceptions for control flow, don't mind me. This isn't actually an error!")) {
-        throw error;
-      }
-    });
-  </script>
+<body style="margin: 0px;">
+    <canvas id="bevy">
+        Javascript and canvas support is required
+    </canvas>
+
+    <script type="module">
+        import init from './voxell_website.js'
+
+        init().catch((error) => {
+            if (!error.message.startsWith("Using exceptions for control flow, don't mind me. This isn't actually an error!")) {
+                throw error;
+            }
+        });
+    </script>
 </body>
 
 </html>

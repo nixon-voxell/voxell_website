@@ -3,7 +3,46 @@ name = "voxell_website"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-bevy = "0.13"
+velyst = { version = "0.1.0", path = "external_crates/velyst" }
+bevy_vello = { version = "0.6.1", features = ["svg"] }
+bevy = { version = "0.14.2", features = ["webgpu"] }
+log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
+strum = "0.26"
+strum_macros = "0.26"
+
+[features]
+default = ["bevy/dynamic_linking"]
+
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+
+# The default profile is optimized for Wasm builds because
+# that's what [Trunk reads](https://github.com/trunk-rs/trunk/issues/605).
+# Optimize for size in the wasm-release profile to reduce load times and bandwidth usage on web.
+[profile.release]
+# Compile the entire crate as one unit.
+# Slows compile times, marginal improvements.
+codegen-units = 1
+# Do a second optimization pass over the entire program, including dependencies.
+# Slows compile times, marginal improvements.
+lto = "thin"
+# Optimize with size in mind (also try "z", sometimes it is better).
+# Slightly slows compile times, great improvements to file size and runtime performance.
+opt-level = "s"
+# Strip all debugging information from the binary to slightly reduce file size.
+strip = "debuginfo"
+
+# Override some settings for native builds.
+[profile.release-native]
+# Default to release profile values.
+inherits = "release"
+# Optimize with performance in mind.
+opt-level = 3
+# Keep debug information in the binary.
+strip = "none"
