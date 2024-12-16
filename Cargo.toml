@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-velyst = { version = "0.1.0", path = "external_crates/velyst" }
+velyst = { version = "0.1.0", path = "external_crates/velyst", features = ["embed-fonts"] }
 bevy_vello = { version = "0.6.1", features = ["svg"] }
 bevy = { version = "0.14.2", features = ["webgpu"] }
 log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
@@ -12,7 +12,7 @@ strum = "0.26"
 strum_macros = "0.26"
 
 [features]
-default = ["bevy/dynamic_linking"]
+default = ["bevy/dynamic_linking", "bevy/file_watcher"]
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]

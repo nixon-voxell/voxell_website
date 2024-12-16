@@ -7,8 +7,7 @@ use bevy_vello::prelude::*;
 use bevy_vello::VelloPlugin;
 use strum::{EnumCount, IntoEnumIterator};
 use strum_macros::{EnumIter, IntoStaticStr};
-use velyst::prelude::*;
-use velyst::typst_element::prelude::*;
+use velyst::{prelude::*, VelystPlugin};
 
 pub struct AppPlugin;
 
@@ -41,8 +40,12 @@ impl Plugin for AppPlugin {
                     ..default()
                 }),
         )
-        .add_plugins(VelloPlugin::default())
-        .add_systems(Startup, (setup, load_icons));
+        .add_plugins((
+            VelloPlugin::default(),
+            VelystPlugin::new(vec!["fonts".into()]),
+        ))
+        .add_systems(PreStartup, (setup, load_icons))
+        .add_systems(Startup, header);
     }
 }
 
@@ -57,17 +60,95 @@ fn setup(mut commands: Commands) {
     });
 }
 
+fn header(mut commands: Commands, asset_server: Res<AssetServer>, icons_map: Res<IconsMap>) {
+    let asset = asset_server.load("typst/main.typ");
+
+    let title = commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Vh(24.0),
+                    height: Val::Vh(16.0),
+                    // border: UiRect::all(Val::Px(1.)),
+                    ..default()
+                },
+                // border_color: BorderColor(Color::WHITE),
+                ..default()
+            },
+            TypstFunc {
+                name: "title",
+                params: typst_params!("Voxell"),
+                asset,
+            },
+        ))
+        .id();
+
+    let social_icons = Icon::iter()
+        .map(|icon| {
+            commands
+                .spawn(VelloAssetBundle {
+                    asset: icons_map[icon].clone_weak(),
+                    coordinate_space: CoordinateSpace::ScreenSpace,
+                    ..default()
+                })
+                .insert(ButtonBundle {
+                    style: Style {
+                        width: Val::Vh(3.0),
+                        height: Val::Vh(3.0),
+                        margin: UiRect::all(Val::Vh(2.0)),
+                        // border: UiRect::all(Val::Px(1.)),
+                        justify_content: JustifyContent::Center,
+                        ..default()
+                    },
+                    // border_color: BorderColor(Color::WHITE),
+                    ..default()
+                })
+                .id()
+        })
+        .collect::<Vec<_>>();
+
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                padding: UiRect::all(Val::Vh(5.0)),
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|builder| {
+            builder
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::Center,
+                        ..default()
+                    },
+                    ..default()
+                })
+                .add_child(title);
+
+            builder
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::Center,
+                        ..default()
+                    },
+                    ..default()
+                })
+                .push_children(&social_icons);
+        });
+}
+
 fn load_icons(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut map = IconsMap::default();
 
     for icon in Icon::iter() {
         let path: &str = icon.into();
         map[icon] = asset_server.load(path.to_string() + ".svg");
-
-        commands.spawn(VelloAssetBundle {
-            asset: map[icon].clone_weak(),
-            ..default()
-        });
     }
 
     commands.insert_resource(map);
